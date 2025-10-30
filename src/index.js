@@ -15,6 +15,28 @@ import snow from "./images/weather_icons/snow.png";
 import snowBack from "./images/weather_backgrounds/snow.jpg";
 import fog from "./images/weather_icons/fog.png";
 import fogBack from "./images/weather_backgrounds/fog.jpg";
+
+const iconMap = {
+  "clear-day": clear,
+  "clear-night": clearNight,
+  "cloudy": cloudy,
+  "partly-cloudy-day": partlyCloudyDay,
+  "partly-cloudy-night": cloudyNight,
+  "rain": rain,
+  "snow": snow,
+  "fog": fog
+};
+
+const backgroundMap = {
+  "clear-day": clearBack,
+  "clear-night": clearNightBack,
+  "cloudy": cloudyBack,
+  "partly-cloudy-day": partlyCloudyDayBack,
+  "partly-cloudy-night": cloudyNightBack,
+  "rain": rainBack,
+  "snow": snowBack,
+  "fog": fogBack
+};
    
 let body = document.querySelector('body');
 let searchValue = document.querySelector('#search');
@@ -39,18 +61,6 @@ let currentCity = 'Reykjavik';
 
 let currentTemp = 'metric';
 
-btnSwitch.addEventListener('click', function(){
-    if(currentTemp === 'metric'){
-        currentTemp = 'us';
-        btnSwitch.textContent = '°C';
-    } else if (currentTemp === 'us'){
-        currentTemp = 'metric';
-        btnSwitch.textContent = '°F';
-    }
-    checkWeather(currentCity);
-})
-
-
 async function checkWeather(city) {
   let url = `https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/${city}?unitGroup=${currentTemp}&include=hours,current&key=PPTXDFZWH6FVBS3ZQ3EWVHF3A&contentType=json`;
   
@@ -69,236 +79,92 @@ async function checkWeather(city) {
     document.querySelector('.humidity').innerHTML = data.currentConditions.humidity + '%';
     document.querySelector('.feelsLike').innerHTML = 'Feels like: ' + Math.round(data.currentConditions.feelslike)+ unit;
 
-    document.querySelector('.temp1').innerHTML = Math.round(data.days[0].hours[3].temp) + unit;
-    document.querySelector('.hour0').innerHTML = new Date(`2000-01-01T${data.days[0].hours[3].datetime}`).toLocaleTimeString('en-US', { hour: 'numeric', hour12: true }).toLowerCase();
-    document.querySelector('.temp2').innerHTML = Math.round(data.days[0].hours[9].temp) + unit;
-    document.querySelector('.hour1').innerHTML = new Date(`2000-01-01T${data.days[0].hours[9].datetime}`).toLocaleTimeString('en-US', { hour: 'numeric', hour12: true }).toLowerCase();
-    document.querySelector('.temp3').innerHTML = Math.round(data.days[0].hours[15].temp) + unit;
-    document.querySelector('.hour2').innerHTML = new Date(`2000-01-01T${data.days[0].hours[15].datetime}`).toLocaleTimeString('en-US', { hour: 'numeric', hour12: true }).toLowerCase();
-    document.querySelector('.temp4').innerHTML = Math.round(data.days[0].hours[21].temp) + unit;
-    document.querySelector('.hour3').innerHTML = new Date(`2000-01-01T${data.days[0].hours[21].datetime}`).toLocaleTimeString('en-US', { hour: 'numeric', hour12: true }).toLowerCase();
-    
-    document.querySelector('.dayTemp1').innerHTML = Math.round(data.days[1].temp) + unit;
-    document.querySelector('.day1').innerHTML = new Date(data.days[1].datetime).toLocaleDateString('en-US', { day: 'numeric', month: 'long' });
-    document.querySelector('.dayTemp2').innerHTML = Math.round(data.days[2].temp) + unit;
-    document.querySelector('.day2').innerHTML = new Date(data.days[2].datetime).toLocaleDateString('en-US', { day: 'numeric', month: 'long' });
-    document.querySelector('.dayTemp3').innerHTML = Math.round(data.days[3].temp) + unit;
-    document.querySelector('.day3').innerHTML = new Date(data.days[3].datetime).toLocaleDateString('en-US', { day: 'numeric', month: 'long' });
-    document.querySelector('.dayTemp4').innerHTML = Math.round(data.days[4].temp) + unit;
-    document.querySelector('.day4').innerHTML = new Date(data.days[4].datetime).toLocaleDateString('en-US', { day: 'numeric', month: 'long' });
-    document.querySelector('.dayTemp5').innerHTML = Math.round(data.days[5].temp) + unit;
-    document.querySelector('.day5').innerHTML = new Date(data.days[5].datetime).toLocaleDateString('en-US', { day: 'numeric', month: 'long' });
+    const hourIndexes = [3, 9, 15, 21];
 
-    if(data.currentConditions.icon === "cloudy"){
-        weatherIcon.src = cloudy;
-        body.style.backgroundImage = `url(${cloudyBack})`; 
-    } else if (data.currentConditions.icon === "partly-cloudy-night"){
-        weatherIcon.src = cloudyNight;
-        body.style.backgroundImage = `url(${cloudyNightBack})`; 
-    } else if (data.currentConditions.icon === "clear-day"){
-        weatherIcon.src = clear;
-        body.style.backgroundImage = `url(${clearBack})`; 
-    } else if (data.currentConditions.icon === "clear-night"){
-        weatherIcon.src = clearNight;
-        body.style.backgroundImage = `url(${clearNightBack})`; 
-    } else if (data.currentConditions.icon === "partly-cloudy-day"){
-        weatherIcon.src = partlyCloudyDay;
-        body.style.backgroundImage = `url(${partlyCloudyDayBack})`; 
-    } else if (data.currentConditions.icon === "rain"){
-        weatherIcon.src = rain;
-        body.style.backgroundImage = `url(${rainBack})`; 
-    } else if (data.currentConditions.icon === "snow"){
-        weatherIcon.src = snow;
-        body.style.backgroundImage = `url(${snowBack})`;
-    }  else if (data.currentConditions.icon === "fog"){
-        weatherIcon.src = fog;
-        body.style.backgroundImage = `url(${fogBack})`;
-    }    
+    hourIndexes.forEach((hourIndex, i) => {
+        document.querySelector(`.temp${i + 1}`).innerHTML = Math.round(data.days[0].hours[hourIndex].temp) + unit;
+        document.querySelector(`.hour${i}`).innerHTML = new Date(`2000-01-01T${data.days[0].hours[hourIndex].datetime}`)
+            .toLocaleTimeString('en-US', { hour: 'numeric', hour12: true })
+            .toLowerCase();
+    });
 
-    if(data.days[0].hours[3].icon === "clear-night"){
-        hour1Icon.src = clearNight;
-    } else if (data.days[0].hours[3].icon === "cloudy"){
-        hour1Icon.src = cloudy;
-    } else if (data.days[0].hours[3].icon === "fog"){
-        hour1Icon.src = fog;
-    } else if (data.days[0].hours[3].icon === "snow"){
-        hour1Icon.src = snow;
-    } else if (data.days[0].hours[3].icon === "rain"){
-        hour1Icon.src = rain;
-    } else if (data.days[0].hours[3].icon === "partly-cloudy-day"){
-        hour1Icon.src = partlyCloudyDay;
-    } else if (data.days[0].hours[3].icon === "clear-day"){
-        hour1Icon.src = clear;
-    } else if (data.days[0].hours[3].icon === "partly-cloudy-night"){
-        hour1Icon.src = cloudyNight;
-    }
+    const dayIndexes = [1, 2, 3, 4, 5];
 
-    if(data.days[0].hours[9].icon === "clear-night"){
-        hour2Icon.src = clearNight;
-    } else if (data.days[0].hours[9].icon === "cloudy"){
-        hour2Icon.src = cloudy;
-    } else if (data.days[0].hours[9].icon === "fog"){
-        hour2Icon.src = fog;
-    } else if (data.days[0].hours[9].icon === "snow"){
-        hour2Icon.src = snow;
-    } else if (data.days[0].hours[9].icon === "rain"){
-        hour2Icon.src = rain;
-    } else if (data.days[0].hours[9].icon === "partly-cloudy-day"){
-        hour2Icon.src = partlyCloudyDay;
-    } else if (data.days[0].hours[9].icon === "clear-day"){
-        hour2Icon.src = clear;
-    } else if (data.days[0].hours[9].icon === "partly-cloudy-night"){
-        hour2Icon.src = cloudyNight;
-    }
+    dayIndexes.forEach((dayIndex, i) => {
+        document.querySelector(`.dayTemp${i+1}`).innerHTML = Math.round(data.days[dayIndex].temp) + unit;
+        document.querySelector(`.day${i+1}`).innerHTML = new Date(data.days[dayIndex].datetime)
+            .toLocaleDateString('en-US', {day: 'numeric', month: 'long'});
+    });
 
-    if(data.days[0].hours[15].icon === "clear-night"){
-        hour3Icon.src = clearNight;
-    } else if (data.days[0].hours[15].icon === "cloudy"){
-        hour3Icon.src = cloudy;
-    } else if (data.days[0].hours[15].icon === "fog"){
-        hour3Icon.src = fog;
-    } else if (data.days[0].hours[15].icon === "snow"){
-        hour3Icon.src = snow;
-    } else if (data.days[0].hours[15].icon === "rain"){
-        hour3Icon.src = rain;
-    } else if (data.days[0].hours[15].icon === "partly-cloudy-day"){
-        hour3Icon.src = partlyCloudyDay;
-    } else if (data.days[0].hours[15].icon === "clear-day"){
-        hour3Icon.src = clear;
-    } else if (data.days[0].hours[15].icon === "partly-cloudy-night"){
-        hour3Icon.src = cloudyNight;
-    }
+    const weatherIconName = data.currentConditions.icon;
+    weatherIcon.src = iconMap[weatherIconName] || clear;
+    body.style.backgroundImage = `url(${backgroundMap[weatherIconName]})`;
 
-    if(data.days[0].hours[21].icon === "clear-night"){
-        hour4Icon.src = clearNight;
-    } else if (data.days[0].hours[21].icon === "cloudy"){
-        hour4Icon.src = cloudy;
-    } else if (data.days[0].hours[21].icon === "fog"){
-        hour4Icon.src = fog;
-    } else if (data.days[0].hours[21].icon === "snow"){
-        hour4Icon.src = snow;
-    } else if (data.days[0].hours[21].icon === "rain"){
-        hour4Icon.src = rain;
-    } else if (data.days[0].hours[21].icon === "partly-cloudy-day"){
-        hour4Icon.src = partlyCloudyDay;
-    } else if (data.days[0].hours[21].icon === "clear-day"){
-        hour4Icon.src = clear;
-    } else if (data.days[0].hours[21].icon === "partly-cloudy-night"){
-        hour4Icon.src = cloudyNight;
-    }
+    const hourIcon1Name = data.days[0].hours[3].icon;
+    hour1Icon.src = iconMap[hourIcon1Name] || clear;
+
+    const hourIcon2Name = data.days[0].hours[9].icon;
+    hour2Icon.src = iconMap[hourIcon2Name] || clear;
+
+    const hourIcon3Name = data.days[0].hours[15].icon;
+    hour3Icon.src = iconMap[hourIcon3Name] || clear;
+
+    const hourIcon4Name = data.days[0].hours[21].icon;
+    hour4Icon.src = iconMap[hourIcon4Name] || clear;
 
     // WEEK WEATHER
-    if(data.days[1].icon === "clear-night"){
-        day1Icon.src = clearNight;
-    } else if (data.days[1].icon === "cloudy"){
-        day1Icon.src = cloudy;
-    } else if (data.days[1].icon === "fog"){
-        day1Icon.src = fog;
-    } else if (data.days[1].icon === "snow"){
-        day1Icon.src = snow;
-    } else if (data.days[1].icon === "rain"){
-        day1Icon.src = rain;
-    } else if (data.days[1].icon === "partly-cloudy-day"){
-        day1Icon.src = partlyCloudyDay;
-    } else if (data.days[1].icon === "clear-day"){
-        day1Icon.src = clear;
-    } else if (data.days[1].icon === "partly-cloudy-night"){
-        day1Icon.src = cloudyNight;
-    }
 
-    if(data.days[2].icon === "clear-night"){
-        day2Icon.src = clearNight;
-    } else if (data.days[2].icon === "cloudy"){
-        day2Icon.src = cloudy;
-    } else if (data.days[2].icon === "fog"){
-        day2Icon.src = fog;
-    } else if (data.days[2].icon === "snow"){
-        day2Icon.src = snow;
-    } else if (data.days[2].icon === "rain"){
-        day2Icon.src = rain;
-    } else if (data.days[2].icon === "partly-cloudy-day"){
-        day2Icon.src = partlyCloudyDay;
-    } else if (data.days[2].icon === "clear-day"){
-        day2Icon.src = clear;
-    } else if (data.days[2].icon === "partly-cloudy-night"){
-        day2Icon.src = cloudyNight;
-    }
+    const dayIcon1Name = data.days[1].icon;
+    day1Icon.src = iconMap[dayIcon1Name] || clear;
+    
+    const dayIcon2Name = data.days[2].icon;
+    day2Icon.src = iconMap[dayIcon2Name] || clear;
+   
+    const dayIcon3Name = data.days[3].icon;
+    day3Icon.src = iconMap[dayIcon3Name] || clear;
 
-    if(data.days[3].icon === "clear-night"){
-        day3Icon.src = clearNight;
-    } else if (data.days[3].icon === "cloudy"){
-        day3Icon.src = cloudy;
-    } else if (data.days[3].icon === "fog"){
-        day3Icon.src = fog;
-    } else if (data.days[3].icon === "snow"){
-        day3Icon.src = snow;
-    } else if (data.days[3].icon === "rain"){
-        day3Icon.src = rain;
-    } else if (data.days[3].icon === "partly-cloudy-day"){
-        day3Icon.src = partlyCloudyDay;
-    } else if (data.days[3].icon === "clear-day"){
-        day3Icon.src = clear;
-    } else if (data.days[3].icon === "partly-cloudy-night"){
-        day3Icon.src = cloudyNight;
-    }
+    const dayIcon4Name = data.days[4].icon;
+    day4Icon.src = iconMap[dayIcon4Name] || clear;
 
-    if(data.days[4].icon === "clear-night"){
-        day4Icon.src = clearNight;
-    } else if (data.days[4].icon === "cloudy"){
-        day4Icon.src = cloudy;
-    } else if (data.days[4].icon === "fog"){
-        day4Icon.src = fog;
-    } else if (data.days[4].icon === "snow"){
-        day4Icon.src = snow;
-    } else if (data.days[4].icon === "rain"){
-        day4Icon.src = rain;
-    } else if (data.days[4].icon === "partly-cloudy-day"){
-        day4Icon.src = partlyCloudyDay;
-    } else if (data.days[4].icon === "clear-day"){
-        day4Icon.src = clear;
-    } else if (data.days[4].icon === "partly-cloudy-night"){
-        day4Icon.src = cloudyNight;
-    }
-
-    if(data.days[5].icon === "clear-night"){
-        day5Icon.src = clearNight;
-    } else if (data.days[5].icon === "cloudy"){
-        day5Icon.src = cloudy;
-    } else if (data.days[5].icon === "fog"){
-        day5Icon.src = fog;
-    } else if (data.days[5].icon === "snow"){
-        day5Icon.src = snow;
-    } else if (data.days[5].icon === "rain"){
-        day5Icon.src = rain;
-    } else if (data.days[5].icon === "partly-cloudy-day"){
-        day5Icon.src = partlyCloudyDay;
-    } else if (data.days[5].icon === "clear-day"){
-        day5Icon.src = clear;
-    } else if (data.days[5].icon === "partly-cloudy-night"){
-        day5Icon.src = cloudyNight;
-    }
+    const dayIcon5Name = data.days[5].icon;
+    day5Icon.src = iconMap[dayIcon5Name] || clear;
 
   } catch (error) {
     console.error("Error loading weather", error);
     document.querySelector('.temp').innerHTML = 'Error loading weather';
   }
 }
+
 checkWeather(currentCity);
 
 searchBtn.addEventListener('click', function(){
   const city = searchValue.value.trim(); 
   if (city) {
     checkWeather(city);
+    currentCity = searchValue.value.trim();
     searchValue.value = '';
   }
+
 });
 searchValue.addEventListener('keydown', function(event){
 if (event.key === "Enter") {
   const city = searchValue.value.trim(); 
   if (city) {
     checkWeather(city);
+    currentCity = searchValue.value.trim();
     searchValue.value = '';
   }
   }
 });
+
+btnSwitch.addEventListener('click', function(){
+    if(currentTemp === 'metric'){
+        currentTemp = 'us';
+        btnSwitch.textContent = '°C';
+    } else if (currentTemp === 'us'){
+        currentTemp = 'metric';
+        btnSwitch.textContent = '°F';
+    }
+    checkWeather(currentCity);
+})
 

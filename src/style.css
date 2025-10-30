@@ -62,7 +62,14 @@ body{
     border: none;
 }
 .FC{
-    background-color: transparent;
+    background-color: rgba(0, 0, 0, 0.202);
+    border-radius: 50px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 30px;
+    height: 30px;
+    padding: 20px;
     color: white;
     border: none;
     font-size: 20px;
