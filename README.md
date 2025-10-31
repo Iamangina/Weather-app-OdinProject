@@ -2,6 +2,8 @@
 
 A simple, weather application built with **JavaScript**, **HTML**, and **CSS**, using the **Visual Crossing Weather API** to display real-time weather conditions, hourly forecasts, and a 5-day outlook.
 
+https://iamangina.github.io/Weather-app-OdinProject/
+
 ---
 
 ## Features
